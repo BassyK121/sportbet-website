@@ -173,12 +173,12 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
+            border: none;
         }
 
         .btn-landing-primary {
             background: var(--gradient-1);
             color: white;
-            border: none;
             box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
         }
 
@@ -198,8 +198,8 @@
             border-color: white;
         }
 
-        /* Signup Panel */
-        .signup-panel {
+        /* Signup/Login Panel */
+        .auth-panel {
             background: var(--glass);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255,255,255,0.1);
@@ -208,13 +208,13 @@
             box-shadow: 0 25px 80px rgba(0,0,0,0.5);
         }
 
-        .signup-panel h2 {
+        .auth-panel h2 {
             font-size: 28px;
             margin-bottom: 10px;
             text-align: center;
         }
 
-        .signup-panel p {
+        .auth-panel p {
             text-align: center;
             color: var(--text-gray);
             margin-bottom: 30px;
@@ -290,21 +290,86 @@
             box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
         }
 
-        .login-link {
+        .auth-switch {
             text-align: center;
             margin-top: 20px;
             color: var(--text-gray);
             font-size: 14px;
         }
 
-        .login-link a {
+        .auth-switch a {
             color: var(--sky-blue);
             text-decoration: none;
             font-weight: 700;
             cursor: pointer;
         }
 
-        /* MAIN APP STYLES (Hidden Initially) */
+        .auth-switch a:hover {
+            text-decoration: underline;
+        }
+
+        /* Verification Modal */
+        .verification-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(10px);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .verification-modal.active {
+            display: flex;
+        }
+
+        .verification-content {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 450px;
+            width: 100%;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            text-align: center;
+            animation: slideUp 0.4s;
+        }
+
+        .verification-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .code-inputs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .code-input {
+            width: 50px;
+            height: 60px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 800;
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            background: var(--dark-bg);
+            color: white;
+            border-radius: 12px;
+        }
+
+        .code-input:focus {
+            outline: none;
+            border-color: var(--sky-blue);
+            transform: scale(1.1);
+        }
+
+        /* MAIN APP STYLES */
         .main-app {
             display: none;
             min-height: 100vh;
@@ -1153,7 +1218,7 @@
             position: fixed;
             bottom: 30px;
             right: 30px;
-            z-index: 3000;
+            z-index: 4000;
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -1319,48 +1384,100 @@
                         <button class="btn-landing btn-landing-primary" onclick="scrollToSignup()">
                             Get Started Now →
                         </button>
-                        <button class="btn-landing btn-landing-secondary" onclick="showLoginModal()">
+                        <button class="btn-landing btn-landing-secondary" onclick="showLoginForm()">
                             Already have an account?
                         </button>
                     </div>
                 </div>
 
-                <div class="signup-panel" id="signup-panel">
+                <!-- SIGNUP PANEL -->
+                <div class="auth-panel" id="signup-panel">
                     <div class="bonus-badge">
                         🎁 Limited Time: 100% Bonus up to ₦100,000!
                     </div>
                     <h2>Create Your Account</h2>
                     <p>Join Betpeza today and start winning</p>
                     
-                    <form onsubmit="handleLandingRegister(event)">
+                    <form onsubmit="handleRegister(event)" id="signup-form">
                         <div class="form-group">
                             <label class="form-label">Full Name</label>
-                            <input type="text" class="form-input" id="landing-name" placeholder="John Doe" required>
+                            <input type="text" class="form-input" id="reg-name" placeholder="John Doe" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Email Address</label>
-                            <input type="email" class="form-input" id="landing-email" placeholder="your@email.com" required>
+                            <input type="email" class="form-input" id="reg-email" placeholder="your@email.com" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Phone Number</label>
-                            <input type="tel" class="form-input" id="landing-phone" placeholder="+234 800 000 0000" required>
+                            <input type="tel" class="form-input" id="reg-phone" placeholder="+234 800 000 0000" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Password</label>
-                            <input type="password" class="form-input" id="landing-password" placeholder="Create secure password" required minlength="6">
+                            <input type="password" class="form-input" id="reg-password" placeholder="Create secure password" required minlength="6">
                         </div>
                         <button type="submit" class="btn-signup">Create Account & Claim Bonus</button>
                     </form>
                     
-                    <div class="login-link">
-                        Already have an account? <a onclick="showLoginModal()">Login here</a>
+                    <div class="auth-switch">
+                        Already have an account? <a onclick="showLoginForm()">Login here</a>
+                    </div>
+                </div>
+
+                <!-- LOGIN PANEL (Hidden by default) -->
+                <div class="auth-panel hidden" id="login-panel">
+                    <h2>Welcome Back! 👋</h2>
+                    <p>Login to continue betting</p>
+                    
+                    <form onsubmit="handleLogin(event)" id="login-form">
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-input" id="login-email" placeholder="your@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-input" id="login-password" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn-signup">Login to Account</button>
+                    </form>
+                    
+                    <div class="auth-switch">
+                        Don't have an account? <a onclick="showSignupForm()">Register now</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MAIN APP (Hidden until login) -->
+    <!-- VERIFICATION MODAL -->
+    <div class="verification-modal" id="verification-modal">
+        <div class="verification-content">
+            <div class="verification-icon">📧</div>
+            <h2 style="font-size: 24px; margin-bottom: 10px;">Verify Your Email</h2>
+            <p style="color: var(--text-gray); margin-bottom: 30px;">
+                We've sent a 6-digit code to <strong id="verify-email-display"></strong><br>
+                Enter it below to complete registration
+            </p>
+            
+            <div class="code-inputs">
+                <input type="text" class="code-input" maxlength="1" oninput="moveToNext(this, 0)" onkeydown="moveToPrev(event, 0)">
+                <input type="text" class="code-input" maxlength="1" oninput="moveToNext(this, 1)" onkeydown="moveToPrev(event, 1)">
+                <input type="text" class="code-input" maxlength="1" oninput="moveToNext(this, 2)" onkeydown="moveToPrev(event, 2)">
+                <input type="text" class="code-input" maxlength="1" oninput="moveToNext(this, 3)" onkeydown="moveToPrev(event, 3)">
+                <input type="text" class="code-input" maxlength="1" oninput="moveToNext(this, 4)" onkeydown="moveToPrev(event, 4)">
+                <input type="text" class="code-input" maxlength="1" oninput="verifyCode(this, 5)" onkeydown="moveToPrev(event, 5)">
+            </div>
+            
+            <p style="color: var(--text-gray); font-size: 14px; margin-top: 20px;">
+                Didn't receive it? <a onclick="resendCode()" style="color: var(--sky-blue); cursor: pointer;">Resend code</a>
+            </p>
+            
+            <button class="btn-signup" onclick="closeVerification()" style="margin-top: 20px; background: transparent; border: 2px solid var(--text-gray);">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
     <div class="main-app" id="main-app">
         <!-- Header -->
         <header class="header">
@@ -1374,7 +1491,7 @@
                     <div class="balance-display">
                         <span>Balance:</span>
                         <span class="balance-amount" id="header-balance">₦0.00</span>
-                        <button class="btn-deposit" onclick="showDepositModal()">+ Deposit</button>
+                        <button class="btn-deposit" onclick="showDeposit()">+ Deposit</button>
                     </div>
                     
                     <div class="user-menu">
@@ -1383,7 +1500,6 @@
                             <div class="dropdown-menu" id="user-dropdown">
                                 <div class="dropdown-item" onclick="showProfile()">👤 Profile</div>
                                 <div class="dropdown-item" onclick="showTransactions()">📊 Transactions</div>
-                                <div class="dropdown-item" onclick="showSettings()">⚙️ Settings</div>
                                 <div class="dropdown-item" onclick="logout()" style="color: var(--danger);">🚪 Logout</div>
                             </div>
                         </div>
@@ -1438,11 +1554,11 @@
                             <div class="stat-label">Live Now</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-value" id="football-upcoming-count">12</div>
+                            <div class="stat-value">12</div>
                             <div class="stat-label">Today</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-value" id="football-leagues-count">8</div>
+                            <div class="stat-value">8</div>
                             <div class="stat-label">Leagues</div>
                         </div>
                         <div class="stat-card">
@@ -1452,24 +1568,11 @@
                     </div>
 
                     <div class="match-categories">
-                        <button class="category-btn active" onclick="filterFootball('all')">
-                            All Matches <span class="count">15</span>
-                        </button>
-                        <button class="category-btn" onclick="filterFootball('live')">
-                            🔴 Live Now <span class="count">3</span>
-                        </button>
-                        <button class="category-btn" onclick="filterFootball('next3h')">
-                            Next 3 Hours <span class="count">5</span>
-                        </button>
-                        <button class="category-btn" onclick="filterFootball('premier')">
-                            Premier League
-                        </button>
-                        <button class="category-btn" onclick="filterFootball('laliga')">
-                            La Liga
-                        </button>
-                        <button class="category-btn" onclick="filterFootball('bundesliga')">
-                            Bundesliga
-                        </button>
+                        <button class="category-btn active" onclick="filterFootball('all')">All Matches</button>
+                        <button class="category-btn" onclick="filterFootball('live')">🔴 Live Now</button>
+                        <button class="category-btn" onclick="filterFootball('next3h')">Next 3 Hours</button>
+                        <button class="category-btn" onclick="filterFootball('premier')">Premier League</button>
+                        <button class="category-btn" onclick="filterFootball('laliga')">La Liga</button>
                     </div>
 
                     <div class="matches-grid" id="football-matches"></div>
@@ -1512,7 +1615,6 @@
                         <button class="category-btn" onclick="filterBasketball('live')">🔴 Live</button>
                         <button class="category-btn" onclick="filterBasketball('nba')">NBA</button>
                         <button class="category-btn" onclick="filterBasketball('euroleague')">EuroLeague</button>
-                        <button class="category-btn" onclick="filterBasketball('quarters')">Quarter Betting</button>
                     </div>
 
                     <div class="matches-grid" id="basketball-matches"></div>
@@ -1554,8 +1656,6 @@
                         <button class="category-btn" onclick="filterTennis('live')">🔴 Live</button>
                         <button class="category-btn" onclick="filterTennis('dubai')">Dubai ATP</button>
                         <button class="category-btn" onclick="filterTennis('acapulco')">Acapulco</button>
-                        <button class="category-btn" onclick="filterTennis('atp')">ATP Only</button>
-                        <button class="category-btn" onclick="filterTennis('wta')">WTA Only</button>
                     </div>
 
                     <div class="matches-grid" id="tennis-matches"></div>
@@ -1596,7 +1696,6 @@
                         <button class="category-btn active" onclick="filterHockey('all')">All Games</button>
                         <button class="category-btn" onclick="filterHockey('live')">🔴 Live</button>
                         <button class="category-btn" onclick="filterHockey('nhl')">NHL</button>
-                        <button class="category-btn" onclick="filterHockey('period')">Period Betting</button>
                     </div>
 
                     <div class="matches-grid" id="hockey-matches"></div>
@@ -1638,7 +1737,6 @@
                         <button class="category-btn" onclick="filterVirtual('vfootball')">V-Football</button>
                         <button class="category-btn" onclick="filterVirtual('vbasketball')">V-Basketball</button>
                         <button class="category-btn" onclick="filterVirtual('vracing')">V-Racing</button>
-                        <button class="category-btn" onclick="filterVirtual('vtennis')">V-Tennis</button>
                     </div>
 
                     <div class="matches-grid" id="virtual-matches"></div>
@@ -1725,37 +1823,12 @@
         </div>
     </div>
 
-    <!-- Login Modal -->
-    <div class="modal-overlay" id="login-modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('login')">&times;</button>
-            <h2 class="modal-title" style="background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Welcome Back! 👋</h2>
-            <p class="modal-subtitle">Login to continue betting</p>
-            
-            <form onsubmit="handleLogin(event)">
-                <div class="form-group">
-                    <label class="form-label">Email Address</label>
-                    <input type="email" class="form-input" id="login-email" placeholder="your@email.com" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <input type="password" class="form-input" id="login-password" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="btn-signup">Login to Account</button>
-            </form>
-            
-            <div style="text-align: center; margin-top: 20px; color: var(--text-gray); font-size: 14px;">
-                Don't have an account? <a onclick="closeModal('login'); scrollToSignup()" style="color: var(--sky-blue); cursor: pointer; font-weight: 700;">Register Now</a>
-            </div>
-        </div>
-    </div>
-
     <!-- Toast Container -->
     <div class="toast-container" id="toast-container"></div>
 
     <script>
         // ==========================================
-        // REAL FEBRUARY 28, 2026 DATA
+        // FEBRUARY 28, 2026 REAL DATA
         // ==========================================
         
         const matchesData = {
@@ -1766,31 +1839,20 @@
                     { id: 'fl3', league: 'Bundesliga', time: "45'", home: 'Bayern Munich', away: 'Union Berlin', score: '1-0', odds: { home: 1.25, draw: 5.00, away: 12.00 } }
                 ],
                 upcoming: [
-                    // Premier League - Feb 28, 2026 [^21^]
                     { id: 'f1', league: 'Premier League', time: '13:30', home: 'Bournemouth', away: 'Sunderland', odds: { home: 1.85, draw: 3.60, away: 4.20 } },
                     { id: 'f2', league: 'Premier League', time: '16:00', home: 'Burnley', away: 'Brentford', odds: { home: 2.90, draw: 3.40, away: 2.40 } },
                     { id: 'f3', league: 'Premier League', time: '16:00', home: 'Newcastle', away: 'Everton', odds: { home: 1.65, draw: 3.80, away: 5.50 } },
                     { id: 'f4', league: 'Premier League', time: '18:30', home: 'Leeds United', away: 'Man City', odds: { home: 4.50, draw: 4.00, away: 1.70 } },
-                    
-                    // La Liga - Feb 28, 2026 [^22^][^28^]
                     { id: 'f5', league: 'La Liga', time: '13:00', home: 'Rayo Vallecano', away: 'Athletic Club', odds: { home: 2.60, draw: 3.20, away: 2.80 } },
                     { id: 'f6', league: 'La Liga', time: '16:15', home: 'Barcelona', away: 'Villarreal', odds: { home: 1.55, draw: 4.50, away: 5.50 } },
                     { id: 'f7', league: 'La Liga', time: '17:30', home: 'Mallorca', away: 'Real Sociedad', odds: { home: 2.80, draw: 3.10, away: 2.60 } },
                     { id: 'f8', league: 'La Liga', time: '20:00', home: 'Real Oviedo', away: 'Atletico Madrid', odds: { home: 5.00, draw: 3.80, away: 1.65 } },
-                    
-                    // Bundesliga - Feb 28, 2026 [^15^]
                     { id: 'f9', league: 'Bundesliga', time: '15:30', home: 'Gladbach', away: 'Union Berlin', odds: { home: 1.95, draw: 3.60, away: 3.80 } },
                     { id: 'f10', league: 'Bundesliga', time: '15:30', home: 'Hoffenheim', away: 'St. Pauli', odds: { home: 1.75, draw: 3.80, away: 4.50 } },
                     { id: 'f11', league: 'Bundesliga', time: '18:30', home: 'Leverkusen', away: 'Wolfsburg', odds: { home: 1.45, draw: 4.50, away: 6.50 } },
-                    
-                    // Serie A
                     { id: 'f12', league: 'Serie A', time: '20:00', home: 'Inter Milan', away: 'Napoli', odds: { home: 2.10, draw: 3.40, away: 3.40 } },
                     { id: 'f13', league: 'Serie A', time: '17:00', home: 'Juventus', away: 'Roma', odds: { home: 2.30, draw: 3.20, away: 3.20 } },
-                    
-                    // Ligue 1
                     { id: 'f14', league: 'Ligue 1', time: '20:00', home: 'PSG', away: 'Marseille', odds: { home: 1.40, draw: 4.80, away: 7.00 } },
-                    
-                    // Primeira Liga
                     { id: 'f15', league: 'Primeira Liga', time: '21:30', home: 'Benfica', away: 'Porto', odds: { home: 2.20, draw: 3.30, away: 3.20 } }
                 ]
             },
@@ -1800,7 +1862,6 @@
                     { id: 'bl2', league: 'NBA', time: "Q4 02:15", home: 'Celtics', away: 'Heat', score: '95-89', odds: { home: 1.35, away: 3.20 } }
                 ],
                 upcoming: [
-                    // NBA Feb 28, 2026 [^10^][^16^][^31^]
                     { id: 'b1', league: 'NBA', time: '19:00', home: 'Trail Blazers', away: 'Hornets', odds: { home: 1.90, away: 1.90 } },
                     { id: 'b2', league: 'NBA', time: '20:30', home: 'Rockets', away: 'Heat', odds: { home: 2.10, away: 1.75 } },
                     { id: 'b3', league: 'NBA', time: '01:00', home: 'Raptors', away: 'Wizards', odds: { home: 1.80, away: 2.00 } },
@@ -1814,16 +1875,11 @@
                     { id: 'tl2', league: 'Dubai ATP', time: "Set 3", home: 'Sinner', away: 'Medvedev', score: '6-7, 6-3, 2-1', odds: { home: 1.85, away: 1.95 } }
                 ],
                 upcoming: [
-                    // Dubai ATP 2026 [^20^]
                     { id: 't1', league: 'Dubai ATP', time: '11:00', home: 'Rublev', away: 'Zverev', odds: { home: 2.40, away: 1.55 } },
                     { id: 't2', league: 'Dubai ATP', time: '14:00', home: 'Fritz', away: 'Rune', odds: { home: 1.90, away: 1.90 } },
                     { id: 't3', league: 'Dubai ATP', time: '17:00', home: 'Tsitsipas', away: 'Norrie', odds: { home: 1.75, away: 2.10 } },
-                    
-                    // Acapulco 2026 [^30^]
                     { id: 't4', league: 'Acapulco ATP', time: '16:00', home: 'Nakashima', away: 'Tiafoe', odds: { home: 2.10, away: 1.75 } },
                     { id: 't5', league: 'Acapulco ATP', time: '19:00', home: 'Paul', away: 'Shelton', odds: { home: 1.65, away: 2.20 } },
-                    
-                    // WTA
                     { id: 't6', league: 'WTA Dubai', time: '12:00', home: 'Swiatek', away: 'Sabalenka', odds: { home: 1.70, away: 2.15 } }
                 ]
             },
@@ -1834,7 +1890,6 @@
                     { id: 'hl3', league: 'NHL', time: "P1 18:20", home: 'Oilers', away: 'Sharks', score: '0-0', odds: { home: 1.45, draw: 5.00, away: 6.50 } }
                 ],
                 upcoming: [
-                    // NHL Feb 28, 2026 [^9^][^11^][^12^][^18^]
                     { id: 'h1', league: 'NHL', time: '18:30', home: 'Sabres', away: 'Lightning', odds: { home: 2.80, draw: 3.80, away: 2.20 } },
                     { id: 'h2', league: 'NHL', time: '21:00', home: 'Blackhawks', away: 'Avalanche', odds: { home: 4.50, draw: 4.20, away: 1.65 } },
                     { id: 'h3', league: 'NHL', time: '18:00', home: 'Red Wings', away: 'Predators', odds: { home: 2.10, draw: 3.80, away: 3.10 } },
@@ -1857,50 +1912,114 @@
         let userBalance = 0;
         let betslip = [];
         let currentPage = 'football';
-        let currentFilters = {
-            football: 'all',
-            basketball: 'all',
-            tennis: 'all',
-            hockey: 'all',
-            virtual: 'all',
-            live: 'all'
-        };
+        let tempUserData = null;
+        let verificationCode = null;
 
         // ==========================================
-        // INITIALIZATION
+        // AUTHENTICATION SYSTEM
         // ==========================================
         
-        document.addEventListener('DOMContentLoaded', () => {
-            checkAuth();
-            renderAllMatches();
-            startLiveSimulation();
-        });
+        function showLoginForm() {
+            document.getElementById('signup-panel').classList.add('hidden');
+            document.getElementById('login-panel').classList.remove('hidden');
+            document.getElementById('login-panel').classList.add('auth-panel');
+        }
 
-        // ==========================================
-        // AUTHENTICATION
-        // ==========================================
-        
-        function handleLandingRegister(e) {
+        function showSignupForm() {
+            document.getElementById('login-panel').classList.add('hidden');
+            document.getElementById('signup-panel').classList.remove('hidden');
+        }
+
+        function scrollToSignup() {
+            document.getElementById('signup-panel').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function handleRegister(e) {
             e.preventDefault();
-            const name = document.getElementById('landing-name').value;
-            const email = document.getElementById('landing-email').value;
-            const phone = document.getElementById('landing-phone').value;
-            const password = document.getElementById('landing-password').value;
             
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const phone = document.getElementById('reg-phone').value;
+            const password = document.getElementById('reg-password').value;
+            
+            // Check if email exists
             const users = JSON.parse(localStorage.getItem('betpeza_users') || '[]');
             if (users.find(u => u.email === email)) {
                 showToast('Email already registered', 'error');
                 return;
             }
             
+            // Generate verification code (6 digits)
+            verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+            tempUserData = { name, email, phone, password };
+            
+            // Show verification modal
+            document.getElementById('verify-email-display').textContent = email;
+            document.getElementById('verification-modal').classList.add('active');
+            
+            // Simulate sending email
+            console.log('Verification code for', email, ':', verificationCode);
+            showToast(`Verification code sent to ${email}`, 'success');
+            
+            // Auto-fill for demo (remove in production)
+            setTimeout(() => {
+                const inputs = document.querySelectorAll('.code-input');
+                inputs.forEach((input, index) => {
+                    input.value = verificationCode[index];
+                });
+            }, 1000);
+        }
+
+        function moveToNext(input, index) {
+            if (input.value.length === 1) {
+                const inputs = document.querySelectorAll('.code-input');
+                if (index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            }
+        }
+
+        function moveToPrev(event, index) {
+            if (event.key === 'Backspace' && !event.target.value) {
+                const inputs = document.querySelectorAll('.code-input');
+                if (index > 0) {
+                    inputs[index - 1].focus();
+                }
+            }
+        }
+
+        function verifyCode(lastInput, index) {
+            const inputs = document.querySelectorAll('.code-input');
+            let enteredCode = '';
+            inputs.forEach(input => enteredCode += input.value);
+            
+            if (enteredCode.length === 6) {
+                if (enteredCode === verificationCode) {
+                    // Success - create account
+                    completeRegistration();
+                } else {
+                    showToast('Invalid code. Please try again.', 'error');
+                    inputs.forEach(input => {
+                        input.value = '';
+                        input.style.borderColor = 'var(--danger)';
+                    });
+                    inputs[0].focus();
+                }
+            }
+        }
+
+        function completeRegistration() {
+            const users = JSON.parse(localStorage.getItem('betpeza_users') || '[]');
+            
             const newUser = {
                 id: Date.now().toString(),
-                name,
-                email,
-                phone,
-                password,
+                name: tempUserData.name,
+                email: tempUserData.email,
+                phone: tempUserData.phone,
+                password: tempUserData.password,
                 balance: 10000,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                verified: true
             };
             
             users.push(newUser);
@@ -1909,12 +2028,36 @@
             currentUser = newUser;
             userBalance = newUser.balance;
             
-            showToast('Welcome! ₦10,000 bonus credited', 'success');
-            enterApp();
+            // Close verification modal
+            document.getElementById('verification-modal').classList.remove('active');
+            
+            // Clear form
+            document.getElementById('signup-form').reset();
+            document.querySelectorAll('.code-input').forEach(input => input.value = '');
+            
+            showToast('Account created successfully! Welcome bonus: ₦10,000', 'success');
+            
+            // Enter main app
+            setTimeout(() => {
+                enterApp();
+            }, 1000);
+        }
+
+        function resendCode() {
+            verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+            console.log('New code:', verificationCode);
+            showToast('New code sent!', 'success');
+        }
+
+        function closeVerification() {
+            document.getElementById('verification-modal').classList.remove('active');
+            tempUserData = null;
+            verificationCode = null;
         }
 
         function handleLogin(e) {
             e.preventDefault();
+            
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             
@@ -1924,11 +2067,14 @@
             if (user) {
                 currentUser = user;
                 userBalance = user.balance;
-                closeModal('login');
-                enterApp();
+                
+                // Clear form
+                document.getElementById('login-form').reset();
+                
                 showToast(`Welcome back, ${user.name}!`, 'success');
+                enterApp();
             } else {
-                showToast('Invalid credentials', 'error');
+                showToast('Invalid email or password', 'error');
             }
         }
 
@@ -1936,6 +2082,7 @@
             document.getElementById('landing-page').style.display = 'none';
             document.getElementById('main-app').classList.add('active');
             updateUI();
+            renderAllMatches();
             saveUserData();
         }
 
@@ -1955,6 +2102,7 @@
                 document.getElementById('landing-page').style.display = 'none';
                 document.getElementById('main-app').classList.add('active');
                 updateUI();
+                renderAllMatches();
             }
         }
 
@@ -1991,7 +2139,7 @@
         }
 
         // ==========================================
-        // NAVIGATION
+        // NAVIGATION & RENDERING (Same as before)
         // ==========================================
         
         function navigateTo(page) {
@@ -2013,32 +2161,15 @@
             });
             
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            
-            // Apply current filter
-            applyFilter(page, currentFilters[page]);
         }
 
-        // ==========================================
-        // RENDERING MATCHES (SPORT-SPECIFIC)
-        // ==========================================
-        
         function renderAllMatches() {
-            // Football - Only football matches
             renderMatches('football-matches', [...matchesData.football.live, ...matchesData.football.upcoming], 'football');
-            
-            // Basketball - Only basketball
             renderMatches('basketball-matches', [...matchesData.basketball.live, ...matchesData.basketball.upcoming], 'basketball');
-            
-            // Tennis - Only tennis
             renderMatches('tennis-matches', [...matchesData.tennis.live, ...matchesData.tennis.upcoming], 'tennis');
-            
-            // Hockey - Only hockey
             renderMatches('hockey-matches', [...matchesData.hockey.live, ...matchesData.hockey.upcoming], 'hockey');
-            
-            // Virtual - Only virtual
             renderMatches('virtual-matches', matchesData.virtual, 'virtual');
             
-            // Live - All live matches from all sports
             const allLive = [
                 ...matchesData.football.live.map(m => ({...m, sport: 'football'})),
                 ...matchesData.basketball.live.map(m => ({...m, sport: 'basketball'})),
@@ -2057,20 +2188,372 @@
                 return;
             }
             
-            container.innerHTML = matches.map(match => createMatchCard(match, type)).join('');
+            container.innerHTML = matches.map(match => {
+                const isLive = match.time.includes("'") || match.time.includes('Q') || match.time.includes('P') || match.time.includes('Set') || match.time === 'LIVE';
+                const cardClass = isLive ? 'match-card live' : 'match-card';
+                
+                let oddsButtons = '';
+                if (type === 'basketball' || type === 'tennis') {
+                    oddsButtons = `
+                        <button class="odd-button ${isSelected(match.id, match.home) ? 'selected' : ''}" 
+                                onclick="addToBetslip('${match.id}', '${match.home}', '${match.home} vs ${match.away}', ${match.odds.home}, '${match.league}')">
+                            <span class="odd-label">${match.home}</span>
+                            <span class="odd-value">${match.odds.home}</span>
+                        </button>
+                        <button class="odd-button" disabled style="opacity: 0.3;">
+                            <span class="odd-label">VS</span>
+                            <span class="odd-value">-</span>
+                        </button>
+                        <button class="odd-button ${isSelected(match.id, match.away) ? 'selected' : ''}" 
+                                onclick="addToBetslip('${match.id}', '${match.away}', '${match.home} vs ${match.away}', ${match.odds.away}, '${match.league}')">
+                            <span class="odd-label">${match.away}</span>
+                            <span class="odd-value">${match.odds.away}</span>
+                        </button>
+                    `;
+                } else {
+                    oddsButtons = `
+                        <button class="odd-button ${isSelected(match.id, match.home) ? 'selected' : ''}" 
+                                onclick="addToBetslip('${match.id}', '${match.home}', '${match.home} vs ${match.away}', ${match.odds.home}, '${match.league}')"
+                                ${match.odds.home === '-' ? 'disabled style="opacity:0.3"' : ''}>
+                            <span class="odd-label">1</span>
+                            <span class="odd-value">${match.odds.home}</span>
+                        </button>
+                        <button class="odd-button ${isSelected(match.id, 'Draw') ? 'selected' : ''}" 
+                                onclick="addToBetslip('${match.id}', 'Draw', '${match.home} vs ${match.away}', ${match.odds.draw}, '${match.league}')"
+                                ${match.odds.draw === '-' ? 'disabled style="opacity:0.3"' : ''}>
+                            <span class="odd-label">X</span>
+                            <span class="odd-value">${match.odds.draw}</span>
+                        </button>
+                        <button class="odd-button ${isSelected(match.id, match.away) ? 'selected' : ''}" 
+                                onclick="addToBetslip('${match.id}', '${match.away}', '${match.home} vs ${match.away}', ${match.odds.away}, '${match.league}')"
+                                ${match.odds.away === '-' ? 'disabled style="opacity:0.3"' : ''}>
+                            <span class="odd-label">2</span>
+                            <span class="odd-value">${match.odds.away}</span>
+                        </button>
+                    `;
+                }
+                
+                return `
+                    <div class="${cardClass}" data-match-id="${match.id}">
+                        <div class="match-header">
+                            <span class="match-league">
+                                ${isLive ? '🔴' : '🏆'} ${match.league}
+                            </span>
+                            <span class="match-time ${isLive ? 'live' : ''}">${match.time}</span>
+                        </div>
+                        ${match.score ? `<div class="match-score">${match.score}</div>` : ''}
+                        <div class="match-teams">
+                            <div class="team">
+                                <div class="team-logo">${match.home[0]}</div>
+                                <div class="team-name">${match.home}</div>
+                            </div>
+                            <div class="vs">VS</div>
+                            <div class="team">
+                                <div class="team-logo">${match.away[0]}</div>
+                                <div class="team-name">${match.away}</div>
+                            </div>
+                        </div>
+                        <div class="match-odds">
+                            ${oddsButtons}
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
-        function createMatchCard(match, type) {
-            const isLive = match.time.includes("'") || match.time.includes('Q') || match.time.includes('P') || match.time.includes('Set') || match.time === 'LIVE';
-            const isVirtual = match.league.startsWith('V-');
+        function isSelected(matchId, selection) {
+            return betslip.some(bet => bet.matchId === matchId && bet.selection === selection);
+        }
+
+        // ==========================================
+        // BETSLIP FUNCTIONS (Same as before)
+        // ==========================================
+        
+        function addToBetslip(matchId, selection, match, odds, league) {
+            if (odds === '-') return;
             
-            let timeDisplay = match.time;
-            if (isLive) {
-                timeDisplay = match.time;
+            const existingIndex = betslip.findIndex(bet => bet.matchId === matchId);
+            if (existingIndex !== -1) {
+                if (betslip[existingIndex].selection === selection) {
+                    betslip.splice(existingIndex, 1);
+                    showToast('Removed from betslip', 'info');
+                } else {
+                    betslip[existingIndex] = { matchId, selection, match, odds: parseFloat(odds), league };
+                    showToast(`Updated: ${selection} @ ${odds}`, 'success');
+                }
+            } else {
+                betslip.push({ matchId, selection, match, odds: parseFloat(odds), league });
+                showToast(`Added: ${selection} @ ${odds}`, 'success');
             }
             
-            const cardClass = isLive ? 'match-card live' : 'match-card';
+            updateBetslip();
+            renderAllMatches();
+        }
+
+        function removeBet(matchId) {
+            betslip = betslip.filter(bet => bet.matchId !== matchId);
+            updateBetslip();
+            renderAllMatches();
+            showToast('Removed from betslip', 'info');
+        }
+
+        function clearBets() {
+            if (betslip.length === 0) return;
+            betslip = [];
+            updateBetslip();
+            renderAllMatches();
+            showToast('Betslip cleared', 'info');
+        }
+
+        function updateBetslip() {
+            const container = document.getElementById('bets-container');
+            const count = document.getElementById('bet-count');
+            const controls = document.getElementById('bet-controls');
             
-            // Determine odds format based on sport
-            let oddsButtons = '';
-            if (type === 'basketball' || type ===
+            count.textContent = betslip.length;
+            
+            if (betslip.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-slip">
+                        <div class="empty-icon">📝</div>
+                        <p>Your betslip is empty</p>
+                        <p style="font-size: 13px; margin-top: 10px; opacity: 0.7;">Click on odds to add selections</p>
+                    </div>
+                `;
+                controls.style.display = 'none';
+                document.getElementById('stake-input').value = '';
+            } else {
+                container.innerHTML = betslip.map(bet => `
+                    <div class="bet-item">
+                        <div class="bet-match">${bet.match}</div>
+                        <div class="bet-selection">
+                            <span>${bet.league} • <strong>${bet.selection}</strong></span>
+                            <span class="bet-odd">${bet.odds.toFixed(2)}</span>
+                        </div>
+                        <button class="remove-bet" onclick="removeBet('${bet.matchId}')">&times;</button>
+                    </div>
+                `).join('');
+                controls.style.display = 'block';
+            }
+            
+            calculateWin();
+        }
+
+        function calculateWin() {
+            const stake = parseFloat(document.getElementById('stake-input').value) || 0;
+            const totalOdds = betslip.reduce((acc, bet) => acc * bet.odds, 1);
+            const potentialWin = stake * totalOdds;
+            
+            document.getElementById('total-odds').textContent = totalOdds.toFixed(2);
+            document.getElementById('potential-win').textContent = '₦' + potentialWin.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            
+            const placeBtn = document.getElementById('place-bet-btn');
+            if (betslip.length === 0 || stake < 100) {
+                placeBtn.disabled = true;
+                placeBtn.textContent = stake < 100 && betslip.length > 0 ? 'Min stake ₦100' : 'Place Bet';
+            } else {
+                placeBtn.disabled = false;
+                placeBtn.textContent = `Place Bet • Win ₦${potentialWin.toLocaleString()}`;
+            }
+        }
+
+        function placeBet() {
+            if (!currentUser) {
+                showToast('Please login to place bets', 'error');
+                return;
+            }
+            
+            const stake = parseFloat(document.getElementById('stake-input').value);
+            if (stake > userBalance) {
+                showToast('Insufficient balance. Please deposit.', 'error');
+                return;
+            }
+            
+            const totalOdds = betslip.reduce((acc, bet) => acc * bet.odds, 1);
+            const potentialWin = stake * totalOdds;
+            
+            userBalance -= stake;
+            updateBalance();
+            
+            showToast(`Bet placed! Potential win: ₦${potentialWin.toLocaleString()}`, 'success');
+            
+            betslip = [];
+            updateBetslip();
+            renderAllMatches();
+            document.getElementById('stake-input').value = '';
+            
+            saveUserData();
+        }
+
+        // ==========================================
+        // FILTER FUNCTIONS
+        // ==========================================
+        
+        function filterFootball(type) {
+            let matches = [];
+            switch(type) {
+                case 'live':
+                    matches = matchesData.football.live;
+                    break;
+                case 'next3h':
+                    matches = matchesData.football.upcoming.slice(0, 5);
+                    break;
+                case 'premier':
+                    matches = [...matchesData.football.live, ...matchesData.football.upcoming].filter(m => m.league === 'Premier League');
+                    break;
+                case 'laliga':
+                    matches = [...matchesData.football.live, ...matchesData.football.upcoming].filter(m => m.league === 'La Liga');
+                    break;
+                default:
+                    matches = [...matchesData.football.live, ...matchesData.football.upcoming];
+            }
+            renderMatches('football-matches', matches, 'football');
+            updateActiveButton(event.target);
+        }
+
+        function filterBasketball(type) {
+            let matches = [];
+            switch(type) {
+                case 'live':
+                    matches = matchesData.basketball.live;
+                    break;
+                case 'nba':
+                    matches = [...matchesData.basketball.live, ...matchesData.basketball.upcoming].filter(m => m.league === 'NBA');
+                    break;
+                default:
+                    matches = [...matchesData.basketball.live, ...matchesData.basketball.upcoming];
+            }
+            renderMatches('basketball-matches', matches, 'basketball');
+            updateActiveButton(event.target);
+        }
+
+        function filterTennis(type) {
+            let matches = [];
+            switch(type) {
+                case 'live':
+                    matches = matchesData.tennis.live;
+                    break;
+                case 'dubai':
+                    matches = [...matchesData.tennis.live, ...matchesData.tennis.upcoming].filter(m => m.league.includes('Dubai'));
+                    break;
+                case 'acapulco':
+                    matches = [...matchesData.tennis.live, ...matchesData.tennis.upcoming].filter(m => m.league.includes('Acapulco'));
+                    break;
+                default:
+                    matches = [...matchesData.tennis.live, ...matchesData.tennis.upcoming];
+            }
+            renderMatches('tennis-matches', matches, 'tennis');
+            updateActiveButton(event.target);
+        }
+
+        function filterHockey(type) {
+            let matches = [];
+            switch(type) {
+                case 'live':
+                    matches = matchesData.hockey.live;
+                    break;
+                case 'nhl':
+                    matches = [...matchesData.hockey.live, ...matchesData.hockey.upcoming].filter(m => m.league === 'NHL');
+                    break;
+                default:
+                    matches = [...matchesData.hockey.live, ...matchesData.hockey.upcoming];
+            }
+            renderMatches('hockey-matches', matches, 'hockey');
+            updateActiveButton(event.target);
+        }
+
+        function filterVirtual(type) {
+            let matches = matchesData.virtual;
+            if (type !== 'all') {
+                const leagueMap = {
+                    'vfootball': 'V-Premier League',
+                    'vbasketball': 'V-NBA',
+                    'vracing': 'V-Racing'
+                };
+                matches = matches.filter(m => m.league.includes(leagueMap[type]) || (type === 'vfootball' && m.league.includes('V-La Liga')));
+            }
+            renderMatches('virtual-matches', matches, 'virtual');
+            updateActiveButton(event.target);
+        }
+
+        function filterLive(type) {
+            let allLive = [
+                ...matchesData.football.live.map(m => ({...m, sport: 'football'})),
+                ...matchesData.basketball.live.map(m => ({...m, sport: 'basketball'})),
+                ...matchesData.tennis.live.map(m => ({...m, sport: 'tennis'})),
+                ...matchesData.hockey.live.map(m => ({...m, sport: 'hockey'}))
+            ];
+            
+            if (type !== 'all') {
+                allLive = allLive.filter(m => m.sport === type);
+            }
+            
+            renderMatches('live-matches', allLive, 'mixed');
+            updateActiveButton(event.target);
+        }
+
+        function updateActiveButton(clickedBtn) {
+            const parent = clickedBtn.parentElement;
+            parent.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            clickedBtn.classList.add('active');
+        }
+
+        // ==========================================
+        // UTILITY FUNCTIONS
+        // ==========================================
+        
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            toast.innerHTML = `<span style="font-size: 20px;">${icons[type]}</span> <span>${message}</span>`;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(400px)';
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
+        }
+
+        function toggleDropdown() {
+            document.getElementById('user-dropdown').classList.toggle('active');
+        }
+
+        function showDeposit() {
+            showToast('Deposit feature coming soon', 'info');
+        }
+
+        function showProfile() {
+            showToast('Profile page coming soon', 'info');
+        }
+
+        function showTransactions() {
+            showToast('Transactions page coming soon', 'info');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.user-avatar')) {
+                document.getElementById('user-dropdown').classList.remove('active');
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+        });
+    </script>
+</body>
+</html>
